@@ -93,7 +93,12 @@ public class EventEngine : EventEngineManager
         int releaseevnetcount = eem.ReleaseEventCount(); // 그 중 몇 개의 초기 이벤트를 방출할건지 개수를 결정
         eem.DicBindingInList(releaseevnetcount); // 결정된 개수만큼 큐에서 꺼내 릴리즈 이벤트 리스트에 딕셔너리 타입으로 다시 담음
         eem.SliceDicinQueForEmailListDataSet(); // 메일 리스트에 필요한 데이터 각 요소를 큐로 각 요소별로 담음
-        eem.PrefabEmailListDequeAfterDataSet();
+        for (int i = 0; i < releaseevnetcount; i++)
+        {
+            Debug.Log("pefab call :" + i);
+            eem.PrefabEmailListDequeAfterDataSet();
+            Debug.Log("Prefab return :" + i);
+        }
 
     }
 

@@ -140,6 +140,7 @@ public class EventEngineManager : MonoBehaviour
                     continue;
                 }
     }
+
     public void PrefabEmailListDequeAfterDataSet()
     {
         int no = EventNo.Dequeue();
@@ -147,19 +148,22 @@ public class EventEngineManager : MonoBehaviour
         string emailtitle = MailSubject.Dequeue();
         string eventcontents = EventContents.Dequeue();
 
+        Debug.Log(emailtitle);
+
         StartCoroutine(SendMail(no, sender, emailtitle, eventcontents));
-        
     }
+
     IEnumerator SendMail(int no, string sender, string emailtitle, string eventcontents)
     {
         GameObject obj = Instantiate(maillist);
         Transform rct = GameObject.Find("Content").transform;
-        Text email_title = obj.GetComponentInChildren<Text>();
-        Text email_content = obj.GetComponentInChildren<Text>();
+        Text email_title = GameObject.Find("email_title").GetComponent<Text>(); // 다른 방법을 써야함 중복되서 이전 버튼이 초기화됨 이하 마찬가지 .
         email_title.text = emailtitle;
-        email_content.text = eventcontents.Substring(0, 20);;
+        Text email_content = GameObject.Find("email_content").GetComponent<Text>();
+        email_content.text = eventcontents.Substring(0,20) + "...";
         obj.transform.SetParent(rct);
         float randomtime = UnityEngine.Random.value;
+        Debug.Log("randomtime = " + randomtime);
         yield return new WaitForSeconds(randomtime);
     }
 
