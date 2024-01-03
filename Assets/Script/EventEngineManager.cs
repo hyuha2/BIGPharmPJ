@@ -157,10 +157,18 @@ public class EventEngineManager : MonoBehaviour
     {
         GameObject obj = Instantiate(maillist);
         Transform rct = GameObject.Find("Content").transform;
-        Text email_title = GameObject.Find("email_title").GetComponent<Text>(); // 다른 방법을 써야함 중복되서 이전 버튼이 초기화됨 이하 마찬가지 .
-        email_title.text = emailtitle;
-        Text email_content = GameObject.Find("email_content").GetComponent<Text>();
-        email_content.text = eventcontents.Substring(0,20) + "...";
+        Text[] texts = obj.GetComponentsInChildren<Text>();
+        foreach (Text text in texts)
+        {
+            if(text.name == "email_title")
+            {
+                text.text = emailtitle;
+            }
+            else
+            {
+                text.text = eventcontents.Substring(0,20) + "...";
+            }
+        }
         obj.transform.SetParent(rct);
         float randomtime = UnityEngine.Random.value;
         Debug.Log("randomtime = " + randomtime);
