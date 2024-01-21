@@ -7,6 +7,7 @@ public class EventEngine : EventEngineManager
 {
     
     public static EventEngineManager eem;
+
     private void Start()
     {
         
@@ -17,11 +18,13 @@ public class EventEngine : EventEngineManager
         }
         
     }
+
     public int RandomNumber(int count)
     {
         int randomnumber = (int)UnityEngine.Random.Range(1, count+1);
         return randomnumber;
     }
+
     public int SpecificDecisionSendEmailCount(string eventtype1) //play evet시 몇 개 보낼지 셀거 
     {
         string[,] eventdata = eem.GetEventDatalist();
@@ -87,19 +90,21 @@ public class EventEngine : EventEngineManager
     public void InitialEventContents(string[,] eventdatalist)
     {
         eem = GameObject.Find("EventEngineManager").GetComponent<EventEngineManager>();
-        string[,] filter = EventFilter(eventdatalist, "Join");
-        eem.AddEventList(filter); // 모든 이벤트 키워드 내용 리스트에 딕셔너리 타입으로 저장 
+        string[,] filter = EventFilter(eventdatalist, "Join"); //Join으로 분류된 이벤트 리스트를 가져옴.
+        eem.AddEventList(filter); // 분류된 모든 이벤트 키워드 내용 리스트에 딕셔너리 타입으로 저장 
         eem.AddQueue(); // 위 리스트를 큐에 모두 담음 (굳이???? 빼내오기 쉬울라고..쓴거)
         int releaseevnetcount = eem.ReleaseEventCount(); // 그 중 몇 개의 초기 이벤트를 방출할건지 개수를 결정
         eem.DicBindingInList(releaseevnetcount); // 결정된 개수만큼 큐에서 꺼내 릴리즈 이벤트 리스트에 딕셔너리 타입으로 다시 담음
         eem.SliceDicinQueForEmailListDataSet(); // 메일 리스트에 필요한 데이터 각 요소를 큐로 각 요소별로 담음
         for (int i = 0; i < releaseevnetcount; i++)
         {
-            Debug.Log("pefab call :" + i);
             eem.PrefabEmailListDequeAfterDataSet();
-            Debug.Log("Prefab return :" + i);
         }
+    }
 
+    public void EventGeneration()
+    {
+        Debug.Log("EvnetGeneration()호출");
     }
 
     public int KeywordCount(string[,] datalist, string keyword)

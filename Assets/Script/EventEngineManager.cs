@@ -10,11 +10,12 @@ public class EventEngineManager : MonoBehaviour
     public string Gamemode {get; set;}
     public static EventEngine engine; // SelectDB()에서 모드 엔진 참고 인스턴트. 
     public CEOEventEngine ceoengine;
-    //public static Queue<object> sendmailwaitList = new();
-    public static Queue<Dictionary<string, object>> sendmailwaitlist = new(); 
+    public TimeController timectr;
+    public static Queue<Dictionary<string, object>> sendmailwaitlist = new(); // release event 결정되기전 큐에 대기.
+
     public List<Dictionary<string, object>> tmpeventlist = new(); // 임시적으로 해당 키워드 이벤트 내용들 저장.
-    public List<Dictionary<string, object>> releaseevent; // 그 중 메일 몇 개 보낼지 랜덤 결정해서 개수만큼 저장. 
-    public Dictionary<string, object> slicedeventlist; // 위 List에서 꺼내 딕셔너리로 키값쌍으로 저장. 
+    public List<Dictionary<string, object>> releaseevent; // 그 중 메일 몇 개 보낼지 랜덤 결정해서 개수만큼 저장.
+
     public Queue<string> ReportHost {get; set;}
     public Queue<string> MailSubject {get; set;}
     public Queue<string> EventContents {get; set;}
@@ -65,7 +66,6 @@ public class EventEngineManager : MonoBehaviour
             ceoengine = GameObject.Find("EventEngineManager").AddComponent<CEOEventEngine>();
             ceoengine = GetComponent<CEOEventEngine>();
             engine = ceoengine;
-            Debug.Log("engine = " + ceoengine.ToString()); 
             break;
         }
         
@@ -103,7 +103,6 @@ public class EventEngineManager : MonoBehaviour
 
     public void SliceDicinQueForEmailListDataSet()
     {
-        slicedeventlist = new();
         object a = null; // 딕셔너리 값 임시로 담음. 
         EventNo = new();
         ReportHost = new();
@@ -115,25 +114,21 @@ public class EventEngineManager : MonoBehaviour
                 {
                     a = kvp.Value;
                     EventNo.Enqueue(Convert.ToInt32(a));
-                    Debug.LogFormat("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
                 }
                 else if(kvp.Key =="ReportHost")
                 {
                     a = kvp.Value;
                     ReportHost.Enqueue((string)a);
-                    Debug.LogFormat("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
                 }
                 else if(kvp.Key == "MailSubject")
                 {
                     a = kvp.Value;
                     MailSubject.Enqueue((string)a);
-                    Debug.LogFormat("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
                 }
                 else if(kvp.Key == "EventContents")
                 {
                     a = kvp.Value;
                     EventContents.Enqueue((string)a);
-                    Debug.LogFormat("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
                 }
                 else
                 {
@@ -148,8 +143,6 @@ public class EventEngineManager : MonoBehaviour
         string emailtitle = MailSubject.Dequeue();
         string eventcontents = EventContents.Dequeue();
 
-        Debug.Log(emailtitle);
-
         StartCoroutine(SendMail(no, sender, emailtitle, eventcontents));
     }
 
@@ -158,20 +151,36 @@ public class EventEngineManager : MonoBehaviour
         GameObject obj = Instantiate(maillist);
         Transform rct = GameObject.Find("Content").transform;
         Text[] texts = obj.GetComponentsInChildren<Text>();
+        if(timectr == null)
+        {
+            timectr = new();
+        }
         foreach (Text text in texts)
         {
-            if(text.name == "email_title")
+            switch (text.name)
             {
-                text.text = emailtitle;
-            }
-            else
-            {
-                text.text = eventcontents.Substring(0,20) + "...";
+                case "email_title":
+                    text.text = emailtitle;
+                    break;
+
+                case "email_content":
+                    if (no == 1)
+                    {
+                        text.text = GameManager.gm.GetUserName() + eventcontents.Substring(0, 30) + "...";
+                    }
+                    else
+                    {
+                        text.text = eventcontents.Substring(0, 30) + "...";
+                    }
+                    break;
+
+                case "email_receive_time":
+                    text.text = timectr.TimeGeneration();
+                    break;
             }
         }
         obj.transform.SetParent(rct);
         float randomtime = UnityEngine.Random.value;
-        Debug.Log("randomtime = " + randomtime);
         yield return new WaitForSeconds(randomtime);
     }
 
@@ -186,7 +195,6 @@ public class EventEngineManager : MonoBehaviour
         for(int i=0; i<tmpeventlist.Count; i++)
         {
             sendmailwaitlist.Enqueue(tmpeventlist[i]);
-            Debug.Log("Whait is Enqueue?? + " + tmpeventlist[i]);
         }
     }
 
@@ -201,6 +209,25 @@ public class EventEngineManager : MonoBehaviour
     public string[,] GetEventDatalist()
     {
         return eventdatalist;
+    }
+
+    public void RemainEventCehck()
+    {
+        if(sendmailwaitlist.Count == 0)
+        {
+            engine.EventGeneration();
+        }
+        else
+        {
+            int waitlistcount = sendmailwaitlist.Count;
+            int releaseeventcount = engine.RandomNumber(waitlistcount);
+            DicBindingInList(releaseeventcount); // 결정된 개수만큼 큐에서 꺼내 릴리즈 이벤트 리스트에 딕셔너리 타입으로 다시 담음
+            SliceDicinQueForEmailListDataSet(); // 메일 리스트에 필요한 데이터 각 요소를 큐로 각 요소별로 담음
+            for (int i = 0; i < releaseeventcount; i++)
+            {
+                PrefabEmailListDequeAfterDataSet();
+            }
+        }
     }
     
 }
