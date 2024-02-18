@@ -6,11 +6,13 @@ using UnityEngine.UI;
 
 public class EventEngineManager : MonoBehaviour
 {
-    private string[,] eventdatalist;
+    public static EventEngineManager em;
+    private static string[,] eventdatalist;
     public string Gamemode {get; set;}
-    public static EventEngine engine; // SelectDB()에서 모드 엔진 참고 인스턴트. 
+    public static EventEngine engine; // SelectDB()에서 모드 엔진 참고 인스턴트.
+    public static IEventEngineChoice iec;
     public CEOEventEngine ceoengine;
-    public TimeController timectr;
+    public TimeController timectr;   
     public static Queue<Dictionary<string, object>> sendmailwaitlist = new(); // release event 결정되기전 큐에 대기.
 
     public List<Dictionary<string, object>> tmpeventlist = new(); // 임시적으로 해당 키워드 이벤트 내용들 저장.
@@ -20,12 +22,26 @@ public class EventEngineManager : MonoBehaviour
     public Queue<string> MailSubject {get; set;}
     public Queue<string> EventContents {get; set;}
     public Queue<int> EventNo {get; set;}
+
     public GameObject maillist;
 
 
+    private void Awake()
+    {
+        if(em==null)
+        {
+            em = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+        timectr = GameObject.Find("TimeController").GetComponent<TimeController>();
+    }
+
     void Start()
     {
-        Debug.Log("EventManager Called");
         string dbname = SelectDB();
         Debug.Log("DBNAME SELECT SUCCESS");
         ReceiveDB(dbname);
@@ -43,7 +59,6 @@ public class EventEngineManager : MonoBehaviour
     public bool NewGameCheck()
     {
         bool newgame = GameObject.Find("GameManager").GetComponent<GameManager>().GetNewGame();
-        Debug.Log("newgame????? " + newgame);
         return newgame;
     }
 
@@ -63,9 +78,9 @@ public class EventEngineManager : MonoBehaviour
             case "btn_ceomode":
             btnname = "EventDB_CEO.csv";
             Gamemode = "CEO";
-            ceoengine = GameObject.Find("EventEngineManager").AddComponent<CEOEventEngine>();
-            ceoengine = GetComponent<CEOEventEngine>();
+            ceoengine = GameObject.Find("EventEngineManager").AddComponent<CEOEventEngine>().GetComponent<CEOEventEngine>();
             engine = ceoengine;
+            iec = new CEOEventEngine();
             break;
         }
         
@@ -80,7 +95,6 @@ public class EventEngineManager : MonoBehaviour
 
     public void AddEventList(string [,] filtered)
     {
-        Debug.Log("Add Event List called");
         for(int i=1; i<filtered.GetLength(0); i++)
         {
             Dictionary<string, object> event_contents = new();
@@ -153,6 +167,7 @@ public class EventEngineManager : MonoBehaviour
         Text[] texts = obj.GetComponentsInChildren<Text>();
         if(timectr == null)
         {
+            Debug.Log("Timecrt is null");
             timectr = new();
         }
         foreach (Text text in texts)
@@ -184,18 +199,18 @@ public class EventEngineManager : MonoBehaviour
         yield return new WaitForSeconds(randomtime);
     }
 
-    public void DelEventList()
+    public void DelTmpEventList()
     {
         tmpeventlist.Clear();
     }
 
     public void AddQueue()
     {
-        Debug.Log("tempventlist count = " + tmpeventlist.Count);
         for(int i=0; i<tmpeventlist.Count; i++)
         {
             sendmailwaitlist.Enqueue(tmpeventlist[i]);
         }
+        DelTmpEventList();
     }
 
     public int ReleaseEventCount()
@@ -229,5 +244,10 @@ public class EventEngineManager : MonoBehaviour
             }
         }
     }
-    
+
+    public EventEngine GetEventEngine()
+    {
+        return engine;
+    }
+
 }

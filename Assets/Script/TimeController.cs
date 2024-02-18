@@ -29,6 +29,7 @@ public class TimeController : GameManager
 
     public string TimeGeneration()
     {
+        Debug.Log("TimeGeneration이 호출되었으며 CurrentTime 값은 =" + CurrentTime);
         DateTime newtime = new(); // CurrentTime 보다 미래의 시간을 받아줄 변수 
         float a = UnityEngine.Random.Range(1,10);
         double random_value = (double)a;
@@ -38,7 +39,7 @@ public class TimeController : GameManager
         newtime = CompareToOldTimeandNewTime(newtime);
         Debug.Log("After compare, newtime vlaue = " + newtime);
         CurrentTime = newtime;
-        Debug.Log("Currenttime = newtime : " + CurrentTime);
+        Debug.Log("Changed currenttime = " + CurrentTime);
         GameTime = CurrentTime.ToString();
         return GameTime;
     }
@@ -50,6 +51,10 @@ public class TimeController : GameManager
         {
             Debug.Log("if called, new time later  than current time");
             return newtime;
+        }
+        else if(result == 0)
+        {
+            TimeGeneration();
         }
         else
         {

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
@@ -10,20 +8,21 @@ public class SceneController : MonoBehaviour
     private static string selectedmode;
     public static SceneController sc = null;
 
-   
     private void Awake()
     {
-        if(sc==null)
+        if (sc==null)
         {
             sc = this;
+            DontDestroyOnLoad(gameObject);
         }
         
     }
-    
+
     public void OnMainScene()
     {
         SceneManager.LoadScene(0);
     }
+
     public void OnClickNewGame()
     {
         SceneManager.LoadScene(1);
@@ -53,4 +52,5 @@ public class SceneController : MonoBehaviour
     {
         return selectedmode;
     }
+
 }

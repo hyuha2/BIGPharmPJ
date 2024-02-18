@@ -25,6 +25,32 @@ public class EventEngine : EventEngineManager
         return randomnumber;
     }
 
+    public int[] RandomEventNo(int ev_generation_count) //인덱스 레인지 에러.확인 필.
+    {
+        int[] eventno = new int[ev_generation_count];
+        for(int i=0; i<eventno.Length; i++)
+        {
+            Debug.Log("eventno length =" + eventno.Length);
+            Debug.Log("i =" + i);
+            int no = UnityEngine.Random.Range(4,GetEventDatalist().GetLength(0));
+            Debug.Log("Rnadom Range for eventno = " + no);
+            eventno.SetValue(no, i);
+
+            for(int j=0; j<i; j++)
+            {
+                while(eventno[j]==eventno[i])
+                {
+                    Debug.Log("While statement entered");
+                    int temp_no = UnityEngine.Random.Range(4, GetEventDatalist().GetLength(0));
+                    eventno.SetValue(no, i);
+                    Debug.Log("Whiele statment end point");
+                }
+            }
+        }
+        Array.Sort(eventno);
+        return eventno;
+    }
+
     public int SpecificDecisionSendEmailCount(string eventtype1) //play evet시 몇 개 보낼지 셀거 
     {
         string[,] eventdata = eem.GetEventDatalist();
@@ -86,6 +112,30 @@ public class EventEngine : EventEngineManager
         }
         return filter;
     }
+
+    public string[,] EventFilterUsingEvetNo(int[] eventno)
+    {
+        string[,] eventdatalist = eem.GetEventDatalist();
+        int rowlength = eventdatalist.GetLength(1);
+        Debug.Log("rowlength = " + rowlength);
+        string[,] contents = new string[eventno.Length+1, rowlength];
+        for(int i=0; i<eventno.Length; i++)
+        {
+            for(int j=0; j<rowlength; j++)
+            {
+                if(i==0)
+                {
+                    for(int c=0; c<rowlength; c++)
+                    {
+                        contents[i, c] = eventdatalist[0, c];
+                    }    
+                }
+                Debug.Log(contents[i + 1, j] + "=" + eventdatalist[eventno[i], j]);
+                contents[i+1, j] = eventdatalist[eventno[i], j];
+            }
+        }
+        return contents;
+    }
     
     public void InitialEventContents(string[,] eventdatalist)
     {
@@ -105,6 +155,24 @@ public class EventEngine : EventEngineManager
     public void EventGeneration()
     {
         Debug.Log("EvnetGeneration()호출");
+        int event_generation_decison_count = (int)UnityEngine.Random.Range(1, 4);
+        int[] eventno = RandomEventNo(event_generation_decison_count);
+        string[,] filter = EventFilterUsingEvetNo(eventno);
+        WokrFlowListandDicandQueueandPrefabEmail(filter);
+        //engine.EventGeneration(event_generation_decison_count, eventno);
+    }
+
+    public void WokrFlowListandDicandQueueandPrefabEmail(string[,] filter) // 이니셜 이벤트 가져다 붙였더니 초기 이벤트가 도출되니 reowpoint 쪽에 아마 수정 필.
+    {
+        eem.AddEventList(filter);
+        eem.AddQueue();
+        int releaseevnetcount = eem.ReleaseEventCount(); // 그 중 몇 개의 초기 이벤트를 방출할건지 개수를 결정
+        eem.DicBindingInList(releaseevnetcount); // 결정된 개수만큼 큐에서 꺼내 릴리즈 이벤트 리스트에 딕셔너리 타입으로 다시 담음
+        eem.SliceDicinQueForEmailListDataSet(); // 메일 리스트에 필요한 데이터 각 요소를 큐로 각 요소별로 담음
+        for (int i = 0; i < releaseevnetcount; i++)
+        {
+            eem.PrefabEmailListDequeAfterDataSet();
+        }
     }
 
     public int KeywordCount(string[,] datalist, string keyword)

@@ -41,3 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Mail_Scroll View
+    uniqueID: 2962125837
+    locked: 0
+  - name: Mail_Content_Scroll View
+    uniqueID: 2490958775
+    locked: 0
