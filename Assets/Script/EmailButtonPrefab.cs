@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class EmailButtonPrefab : MonoBehaviour
 {
-    public GameObject mcsv;
+    public GameObject mcp;
     public string txt_mail_title;
     public string txt_mail_receive_sender;
     public string txt_mail_receive_content;
@@ -14,49 +14,49 @@ public class EmailButtonPrefab : MonoBehaviour
 
     public void Awake()
     {
-        mcsv = GetMCSV(); //초기값 비활성화 상태이기 때문에 가져옴.
+        mcp = GetMCP(); //초기값 비활성화 상태이기 때문에 가져옴.
     }
 
     public void Start()
     {
-        if(mcsv!=null)
+        if(mcp!=null)
         {
-            mcsv.SetActive(false);
+            mcp.SetActive(false);
         }
         else
         {
-            mcsv = GetMCSV();
-            mcsv.SetActive(false);
+            mcp = GetMCP();
+            mcp.SetActive(false);
         }
     }
 
 
     public void ButtonPrefabOnClick()
     {
-        if(mcsv!=null)
+        if(mcp!=null)
         {
-            mcsv.SetActive(true);
+            mcp.SetActive(true);
         }
         else
         {
-            mcsv = GetMCSV();
-            mcsv.SetActive(true);
+            mcp = GetMCP();
+            mcp.SetActive(true);
         }
         SetMailProperty();
     }
 
-    public GameObject GetMCSV()
+    public GameObject GetMCP()
     {
         Debug.Log("GET MCSV 호출");
         GameObject pcanvas = GameObject.Find("Canvas");
-        Transform mcsvtr = pcanvas.transform.Find("Mail_Content_Scroll View");
+        Transform mcsvtr = pcanvas.transform.Find("Mail_Content_Panel");
         Transform[] childObject = mcsvtr.GetComponentsInChildren<Transform>();
         foreach(Transform pr in childObject)
-            if(pr.gameObject.name == "Mail_Content_Scroll View")
+            if(pr.gameObject.name == "Mail_Content_Panel")
             {
-                mcsv = pr.gameObject;
+                mcp = pr.gameObject;
             }
-        return mcsv;
+        return mcp;
     }
 
     public void SetMailProperty()
