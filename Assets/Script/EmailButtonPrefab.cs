@@ -6,16 +6,15 @@ using UnityEngine.UI;
 public class EmailButtonPrefab : MonoBehaviour
 {
     public GameObject mcsv;
-    public GameObject msv;
-    public GameObject msvInstanceCopy;
-    public SceneController sc;
+    public string txt_mail_title;
+    public string txt_mail_receive_sender;
+    public string txt_mail_receive_content;
+    public string txt_mail_receive_time;
+
 
     public void Awake()
     {
-        mcsv = GameObject.Find("Canvas/Mail_Content_Scroll View");
-        msv = GameObject.Find("Canvas/Mail_Scroll View");
-        Debug.Log("EmailPrefab_Awake_mcsv =" + mcsv);
-        Debug.Log("EmailPrefab_Awake_msv =" + msv);
+        mcsv = GetMCSV(); //초기값 비활성화 상태이기 때문에 가져옴.
     }
 
     public void Start()
@@ -27,22 +26,13 @@ public class EmailButtonPrefab : MonoBehaviour
         else
         {
             mcsv = GetMCSV();
+            mcsv.SetActive(false);
         }
     }
 
 
     public void ButtonPrefabOnClick()
     {
-        if(msv!=null)
-        {
-            msv.SetActive(false);
-        }
-        else
-        {
-            msv = GetMSV();
-            msv.SetActive(false);
-        }
-
         if(mcsv!=null)
         {
             mcsv.SetActive(true);
@@ -52,38 +42,29 @@ public class EmailButtonPrefab : MonoBehaviour
             mcsv = GetMCSV();
             mcsv.SetActive(true);
         }
+        SetMailProperty();
     }
 
     public GameObject GetMCSV()
     {
-        GameObject parentCanvas = GameObject.Find("Canvas").gameObject;
-        Transform[] childObject = parentCanvas.GetComponentsInChildren<Transform>();
+        Debug.Log("GET MCSV 호출");
+        GameObject pcanvas = GameObject.Find("Canvas");
+        Transform mcsvtr = pcanvas.transform.Find("Mail_Content_Scroll View");
+        Transform[] childObject = mcsvtr.GetComponentsInChildren<Transform>();
         foreach(Transform pr in childObject)
             if(pr.gameObject.name == "Mail_Content_Scroll View")
             {
                 mcsv = pr.gameObject;
             }
-        //mcsv = tmcsv.gameObject;
         return mcsv;
     }
 
-    public GameObject GetMSV()
+    public void SetMailProperty()
     {
-        GameObject parentCanvas = GameObject.Find("Canvas").gameObject;
-        Transform[] childObject = parentCanvas.GetComponentsInChildren<Transform>();
-        foreach (Transform pr in childObject)
-            if (pr.gameObject.name == "Mail_Scroll View")
-            {
-                msv = pr.gameObject;
-            }
-        //mcsv = tmcsv.gameObject;
-        return msv;
-    }
-
-    public void ButtonCloseOnClick()
-    {
-        mcsv.SetActive(false);
-        msv.SetActive(true);
+        Text title = GameObject.Find("txt_mail_receive_title").GetComponent<Text>();
+        Text content = GameObject.Find("txt_mail_receive_content").GetComponent<Text>();
+        title.text = txt_mail_title;
+        content.text = txt_mail_receive_content;
     }
 
 

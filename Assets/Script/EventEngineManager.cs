@@ -165,32 +165,38 @@ public class EventEngineManager : MonoBehaviour
         GameObject obj = Instantiate(maillist);
         Transform rct = GameObject.Find("Content").transform;
         Text[] texts = obj.GetComponentsInChildren<Text>();
-        if(timectr == null)
+        if (timectr == null)
         {
-            Debug.Log("Timecrt is null");
             timectr = new();
         }
+        EmailButtonPrefab mailist_controller = obj.transform.Find("MailListController").GetComponent<EmailButtonPrefab>();
         foreach (Text text in texts)
         {
             switch (text.name)
             {
                 case "email_title":
                     text.text = emailtitle;
+                    mailist_controller.txt_mail_title = emailtitle;
                     break;
 
                 case "email_content":
                     if (no == 1)
                     {
-                        text.text = GameManager.gm.GetUserName() + eventcontents.Substring(0, 30) + "...";
+                        //text.text = GameManager.gm.GetUserName() + eventcontents.Substring(0, 30) + "...";
+                        text.text = GameManager.gm.GetUserName() + eventcontents;
+                        mailist_controller.txt_mail_receive_content = text.text;
                     }
                     else
                     {
-                        text.text = eventcontents.Substring(0, 30) + "...";
+                        //text.text = eventcontents.Substring(0, 30) + "...";
+                        text.text = eventcontents;
+                        mailist_controller.txt_mail_receive_content = eventcontents;
                     }
                     break;
 
                 case "email_receive_time":
                     text.text = timectr.TimeGeneration();
+                    mailist_controller.txt_mail_receive_time = text.text;
                     break;
             }
         }
