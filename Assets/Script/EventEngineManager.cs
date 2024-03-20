@@ -18,10 +18,13 @@ public class EventEngineManager : MonoBehaviour
     public List<Dictionary<string, object>> tmpeventlist = new(); // 임시적으로 해당 키워드 이벤트 내용들 저장.
     public List<Dictionary<string, object>> releaseevent; // 그 중 메일 몇 개 보낼지 랜덤 결정해서 개수만큼 저장.
 
-    public Queue<string> ReportHost {get; set;}
-    public Queue<string> MailSubject {get; set;}
-    public Queue<string> EventContents {get; set;}
-    public Queue<int> EventNo {get; set;}
+    public Queue<string> ReportHost { get; set; } = new();
+    public Queue<string> MailSubject { get; set; } = new();
+    public Queue<string> EventContents { get; set; } = new();
+    public Queue<int> EventNo { get; set; } = new();
+    public Queue<string> ButtonAction1 { get; set; } = new();
+    public Queue<string> ButtonAction2 { get; set; } = new();
+    public Queue<string> ButtonAction3 { get; set; } = new();
 
     public GameObject maillist;
 
@@ -98,7 +101,7 @@ public class EventEngineManager : MonoBehaviour
         for(int i=1; i<filtered.GetLength(0); i++)
         {
             Dictionary<string, object> event_contents = new();
-            for(int j=0; j<filtered.GetLength(1); j++)
+            for (int j=0; j<filtered.GetLength(1); j++)
             {
                 event_contents[filtered[0,j]]= filtered[i,j];
             }
@@ -111,38 +114,41 @@ public class EventEngineManager : MonoBehaviour
         releaseevent = new();
         for(int i=0; i<count; i++)
         {
-            releaseevent.Add(sendmailwaitlist.Dequeue()); 
+            releaseevent.Add(sendmailwaitlist.Dequeue());
         }
     }
 
     public void SliceDicinQueForEmailListDataSet()
     {
-        object a = null; // 딕셔너리 값 임시로 담음. 
-        EventNo = new();
-        ReportHost = new();
-        MailSubject = new();
-        EventContents = new();
-        foreach(Dictionary<string, object> tmp in releaseevent)
-            foreach(KeyValuePair<string, object> kvp in tmp)
+        foreach (Dictionary<string, object> tmp in releaseevent)
+            foreach (KeyValuePair<string, object> kvp in tmp)
                 if(kvp.Key == "No")
                 {
-                    a = kvp.Value;
-                    EventNo.Enqueue(Convert.ToInt32(a));
+                    EventNo.Enqueue(Convert.ToInt32(kvp.Value));
                 }
                 else if(kvp.Key =="ReportHost")
                 {
-                    a = kvp.Value;
-                    ReportHost.Enqueue((string)a);
+                    ReportHost.Enqueue((string)kvp.Value);
                 }
                 else if(kvp.Key == "MailSubject")
                 {
-                    a = kvp.Value;
-                    MailSubject.Enqueue((string)a);
+                    MailSubject.Enqueue((string)kvp.Value);
                 }
                 else if(kvp.Key == "EventContents")
                 {
-                    a = kvp.Value;
-                    EventContents.Enqueue((string)a);
+                    EventContents.Enqueue((string)kvp.Value);
+                }
+                else if(kvp.Key == "ButtonAction1")
+                {
+                    ButtonAction1.Enqueue((string)kvp.Value);
+                }
+                else if(kvp.Key == "ButtonAction2")
+                {
+                    ButtonAction2.Enqueue((string)kvp.Value);
+                }
+                else if(kvp.Key == "ButtonAction3")
+                {
+                    ButtonAction3.Enqueue((string)kvp.Value);
                 }
                 else
                 {
@@ -156,11 +162,14 @@ public class EventEngineManager : MonoBehaviour
         string sender = ReportHost.Dequeue();
         string emailtitle = MailSubject.Dequeue();
         string eventcontents = EventContents.Dequeue();
+        string buttonaction1 = ButtonAction1.Dequeue();
+        string buttonaction2 = ButtonAction2.Dequeue();
+        string buttonaction3 = ButtonAction3.Dequeue();
 
-        StartCoroutine(SendMail(no, sender, emailtitle, eventcontents));
+        StartCoroutine(SendMail(no, sender, emailtitle, eventcontents, buttonaction1, buttonaction2, buttonaction3));
     }
 
-    IEnumerator SendMail(int no, string sender, string emailtitle, string eventcontents)
+    IEnumerator SendMail(int no, string sender, string emailtitle, string eventcontents, string buttonaction1, string buttonaction2, string buttonaction3) // 이 부분에서 이벤트 트랙커를 만들고 버튼도 구분 할 수 있게 해야하겠음 .
     {
         GameObject obj = Instantiate(maillist);
         Transform rct = GameObject.Find("Content").transform;
@@ -170,6 +179,10 @@ public class EventEngineManager : MonoBehaviour
             timectr = new();
         }
         EmailButtonPrefab mailist_controller = obj.transform.Find("MailListController").GetComponent<EmailButtonPrefab>();
+        mailist_controller.buttonaction1 = buttonaction1;
+        mailist_controller.buttonaction2 = buttonaction2;
+        mailist_controller.buttonaction3 = buttonaction3;
+
         foreach (Text text in texts)
         {
             switch (text.name)

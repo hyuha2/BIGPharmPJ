@@ -21,7 +21,7 @@ public class CSVController : MonoBehaviour
             string[] emptycolumn = row[i].Split(',');
             for(int j = 0; j < emptycolumn.Length; j++)
             {
-                datalist[i, j] = emptycolumn[j];
+                datalist[i, j] = emptycolumn[j].Trim();
             }
         }
         return datalist;   

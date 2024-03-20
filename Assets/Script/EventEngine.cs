@@ -13,7 +13,6 @@ public class EventEngine : EventEngineManager
         
         if(eem==null)
         {
-            Debug.Log("Start called in EventEnigne");
             eem = GameObject.Find("EventEngineManager").GetComponent<EventEngineManager>();
         }
         
@@ -25,24 +24,21 @@ public class EventEngine : EventEngineManager
         return randomnumber;
     }
 
-    public int[] RandomEventNo(int ev_generation_count) //인덱스 레인지 에러.확인 필.
+    public int[] RandomEventNo(int ev_generation_count)
     {
         int[] eventno = new int[ev_generation_count];
         for(int i=0; i<eventno.Length; i++)
         {
-            Debug.Log("eventno length =" + eventno.Length);
-            Debug.Log("i =" + i);
             int no = UnityEngine.Random.Range(4,GetEventDatalist().GetLength(0));
-            Debug.Log("Rnadom Range for eventno = " + no);
-            eventno.SetValue(no, i);
+            eventno.SetValue(no, i);//값을 인덱스에 set. SetValue(Value, index no) 
 
             for(int j=0; j<i; j++)
             {
-                while(eventno[j]==eventno[i])
+                while(eventno[j]==eventno[i]) // evetno가 중복으로 생성 될 경우 재생성을 위해 반복문 들어감.
                 {
                     Debug.Log("While statement entered");
                     int temp_no = UnityEngine.Random.Range(4, GetEventDatalist().GetLength(0));
-                    eventno.SetValue(no, i);
+                    eventno.SetValue(temp_no, i);
                     Debug.Log("Whiele statment end point");
                 }
             }
