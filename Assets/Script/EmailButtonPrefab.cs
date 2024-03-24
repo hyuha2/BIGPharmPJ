@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class EmailButtonPrefab : MonoBehaviour
 {
     public GameObject mcp;
+    public int prefabInstanceID;
     public string txt_mail_title;
     public string txt_mail_receive_sender;
     public string txt_mail_receive_content;
@@ -40,7 +41,7 @@ public class EmailButtonPrefab : MonoBehaviour
 
     public void ButtonPrefabOnClick()
     {
-        if(mcp!=null)
+        if (mcp!=null)
         {
             mcp.SetActive(true);
         }
@@ -49,7 +50,6 @@ public class EmailButtonPrefab : MonoBehaviour
             mcp = GetMCP();
             mcp.SetActive(true);
         }
-
         btn_decision_action1 = GameObject.Find("btn_decision_action1");
         btn_decision_action2 = GameObject.Find("btn_decision_action2");
         btn_decision_action3 = GameObject.Find("btn_decision_action3");
@@ -76,7 +76,7 @@ public class EmailButtonPrefab : MonoBehaviour
         Text content = GameObject.Find("txt_mail_receive_content").GetComponent<Text>();
         title.text = txt_mail_title;
         content.text = txt_mail_receive_content;
-        Debug.Log(buttonaction1 + buttonaction2 + buttonaction3);
+        Debug.Log("str btn 1,2,3 = " + buttonaction1 + buttonaction2 + buttonaction3);
 
         if (buttonaction1.Contains("N/A"))
         {
@@ -152,5 +152,4 @@ public class EmailButtonPrefab : MonoBehaviour
         }
         return obj;
     }
-
 }

@@ -28,6 +28,10 @@ public class EventEngineManager : MonoBehaviour
 
     public GameObject maillist;
 
+    private Dictionary<int, GameObject> prefabInstanceID = new Dictionary<int, GameObject>();
+
+    public int lastePrefabInstanceID;
+
 
     private void Awake()
     {
@@ -172,6 +176,9 @@ public class EventEngineManager : MonoBehaviour
     IEnumerator SendMail(int no, string sender, string emailtitle, string eventcontents, string buttonaction1, string buttonaction2, string buttonaction3) // 이 부분에서 이벤트 트랙커를 만들고 버튼도 구분 할 수 있게 해야하겠음 .
     {
         GameObject obj = Instantiate(maillist);
+        lastePrefabInstanceID = obj.GetInstanceID();
+        Debug.Log("Prefab Isntance ID = " + lastePrefabInstanceID);
+        prefabInstanceID.Add(lastePrefabInstanceID, obj);
         Transform rct = GameObject.Find("Content").transform;
         Text[] texts = obj.GetComponentsInChildren<Text>();
         if (timectr == null)
@@ -182,7 +189,7 @@ public class EventEngineManager : MonoBehaviour
         mailist_controller.buttonaction1 = buttonaction1;
         mailist_controller.buttonaction2 = buttonaction2;
         mailist_controller.buttonaction3 = buttonaction3;
-
+        mailist_controller.prefabInstanceID = lastePrefabInstanceID;
         foreach (Text text in texts)
         {
             switch (text.name)
@@ -264,9 +271,38 @@ public class EventEngineManager : MonoBehaviour
         }
     }
 
-    public EventEngine GetEventEngine()
+    public EventEngine GetEventEngine() 
     {
         return engine;
     }
 
+    public void OnClickDelEmail() // 메일 삭제 구현해야 함. 
+    {
+        EmailButtonPrefab epb = GameObject.Find("MailListController").GetComponent<EmailButtonPrefab>();
+        Debug.Log("Instance ID in EmailPrefabClass =" + epb.prefabInstanceID);
+        if (epb.btn_decision_action1 && epb.btn_decision_action2 && epb.btn_decision_action3 != null)
+        {
+            Debug.Log("epb button cehck = " + epb.buttonaction1 + epb.buttonaction2 + epb.buttonaction3);
+            Transform tr = GameObject.Find("Canvas").transform.Find("Del_YesOrNo_Panel").transform;
+            gameObject.SetActive(tr); // 이 부분 검토 .
+            EventControllPanel ecp = GameObject.Find("Del_YesOrNo_Panel").GetComponent<EventControllPanel>();
+            ecp.SetConfirmMessage("삭제하시겠습니까?");
+
+            Debug.Log("삭제하시겠습니까?");
+        }
+        else
+        {
+            if(prefabInstanceID.TryGetValue(epb.prefabInstanceID, out GameObject instance))
+            {
+                Destroy(instance);
+                prefabInstanceID.Remove(epb.prefabInstanceID);
+                epb.mcp.SetActive(false);
+                Destroy(epb);
+            }
+            else
+            {
+                Debug.Log("실패인?");
+            }
+        }
+    }
 }
