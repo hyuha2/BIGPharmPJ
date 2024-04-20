@@ -1,23 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Burst.CompilerServices;
 using UnityEngine;
 
-struct PlayData
+public class PlayData : MonoBehaviour
 {
-    public long companymoney;
-    public int qcemployee;
-    public int rdemployee;
-    public int mfgemployee;
-    public int ademployee;
+    private string UserName { get; set; }
+    private long Company_Money { get; set; }
+    private int Employee_Total { get; set; }
+    private List<int> HiredList { get; set; }
+    private EmployeeManager EPM { get; set; }
 
-    public PlayData(long companymoney, int qcemployee, int rdemployee, int mfgemployee, int ademployee)
+    private Time GameCurrentTime { get; set; }
+    
+
+    // Start is called before the first frame update
+    void Start()
     {
-        this.companymoney = companymoney;
-        this.qcemployee = qcemployee;
-        this.rdemployee = rdemployee;
-        this.mfgemployee = mfgemployee;
-        this.ademployee = ademployee;
+        
     }
 
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
 }

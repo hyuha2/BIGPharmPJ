@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     private static string username;
     private static string time;
     private static bool newgame = false;
+    private static long companymoney;
     public static GameManager gm = null;
     private void Awake()
     {
@@ -19,8 +20,11 @@ public class GameManager : MonoBehaviour
     }
 
     void Start()
-    {        
-            
+    {
+        if(companymoney == 0)
+        {
+            companymoney = 1000000000;
+        }
     }
 
     // Update is called once per frame

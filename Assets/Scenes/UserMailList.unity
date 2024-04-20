@@ -741,6 +741,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ceoengine: {fileID: 0}
   timectr: {fileID: 0}
+  hub: {fileID: 0}
   maillist: {fileID: 978193454716335827, guid: 205f09e7c05de44019d46db54231b7c3, type: 3}
   lastePrefabInstanceID: 0
 --- !u!1 &273906640
@@ -1535,6 +1536,7 @@ GameObject:
   - component: {fileID: 695430921}
   - component: {fileID: 695430923}
   - component: {fileID: 695430922}
+  - component: {fileID: 695430924}
   m_Layer: 5
   m_Name: Mail_Content_Panel
   m_TagString: Untagged
@@ -1609,6 +1611,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 695430920}
   m_CullTransparentMesh: 1
+--- !u!114 &695430924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 695430920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d4226b3217d24e1b83e6b6d7026e093, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &724687494
 GameObject:
   m_ObjectHideFlags: 0
@@ -2123,7 +2137,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1013784224}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1474948120}
+        m_TargetAssemblyTypeName: EventConfirmPanel, Assembly-CSharp
+        m_MethodName: OnClickRight
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1013784224
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2971,7 +2997,7 @@ GameObject:
   - component: {fileID: 1474948116}
   - component: {fileID: 1474948119}
   - component: {fileID: 1474948118}
-  - component: {fileID: 1474948117}
+  - component: {fileID: 1474948120}
   m_Layer: 5
   m_Name: Del_YesOrNo_Panel
   m_TagString: Untagged
@@ -3001,23 +3027,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 106.890015}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1474948117
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1474948115}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3e4ebab98089a44b9886556dc7214992, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  btn_answer1: {fileID: 1555595762}
-  btn_answer2: {fileID: 1013784223}
-  txt_confirmMessage: {fileID: 61113102}
-  txt_answer1: {fileID: 1016690905}
-  txt_answer2: {fileID: 1834373811}
 --- !u!114 &1474948118
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3031,7 +3040,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3056,6 +3065,64 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1474948115}
   m_CullTransparentMesh: 1
+--- !u!114 &1474948120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1474948115}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e4ebab98089a44b9886556dc7214992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &1517047628
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1517047630}
+  - component: {fileID: 1517047629}
+  m_Layer: 0
+  m_Name: EmployeeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1517047629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1517047628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e778c336a8e4646428505313f4c9d7d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  epm: {fileID: 0}
+  hired_person: 
+--- !u!4 &1517047630
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1517047628}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 642, y: 1389, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1525255824
 GameObject:
   m_ObjectHideFlags: 0
@@ -3174,7 +3241,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1555595763}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1474948120}
+        m_TargetAssemblyTypeName: EventConfirmPanel, Assembly-CSharp
+        m_MethodName: OnLeftClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1555595763
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4383,3 +4462,4 @@ SceneRoots:
   - {fileID: 267053996}
   - {fileID: 382783133}
   - {fileID: 915545796}
+  - {fileID: 1517047630}

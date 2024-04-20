@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,7 @@ public class EmailButtonPrefab : MonoBehaviour
 {
     public GameObject mcp;
     public int prefabInstanceID;
+    public int mailContentScriptID;
     public string txt_mail_title;
     public string txt_mail_receive_sender;
     public string txt_mail_receive_content;
@@ -74,82 +76,106 @@ public class EmailButtonPrefab : MonoBehaviour
     {
         Text title = GameObject.Find("txt_mail_receive_title").GetComponent<Text>();
         Text content = GameObject.Find("txt_mail_receive_content").GetComponent<Text>();
+        Text sender = GameObject.Find("txt_mail_receive_sender").GetComponent<Text>();
         title.text = txt_mail_title;
         content.text = txt_mail_receive_content;
-        Debug.Log("str btn 1,2,3 = " + buttonaction1 + buttonaction2 + buttonaction3);
+        sender.text = txt_mail_receive_sender;
+        Debug.Log("str btn 1,2,3 = " + buttonaction1 +" "+ buttonaction2 + " "+buttonaction3);
 
         if (buttonaction1.Contains("N/A"))
         {
-            try
+            if(btn_decision_action1 != null)
             {
                 btn_decision_action1.SetActive(false);
-            }
-            catch
-            {
-                return;
             }
         }
         else
         {
-            btn_decision_action1 = DisableGameObjectChangeEnable("Mail_Content_Panel", "btn_decision_action1");
-            Text txt = btn_decision_action1.GetComponentInChildren<Text>();
-            txt.text = buttonaction1;
+            DisableGameObjectChangeEnable("Mail_Content_Panel", "btn_decision_action1");
+            try
+            {
+                Text txt = btn_decision_action1.GetComponentInChildren<Text>();
+                txt.text = buttonaction1;
+            }
+            catch (NullReferenceException e)
+            {
+                btn_decision_action1 = GameObject.Find("btn_decision_action1");
+                Text txt = btn_decision_action1.GetComponentInChildren<Text>();
+                txt.text = buttonaction1;
+            }
             btn_decision_action1.SetActive(true);
         }
 
         if (buttonaction2.Contains("N/A"))
         {
-            try
+            if (btn_decision_action2 != null)
             {
                 btn_decision_action2.SetActive(false);
-            }
-            catch
-            {
-                return;
             }
         }
         else
         {
-            btn_decision_action2 = DisableGameObjectChangeEnable("Mail_Content_Panel", "btn_decision_action2");
-            Text txt = btn_decision_action2.GetComponentInChildren<Text>();
-            txt.text = buttonaction2;
-            btn_decision_action2.SetActive(true);
+            DisableGameObjectChangeEnable("Mail_Content_Panel", "btn_decision_action2");
+            try
+            {
+                Text txt = btn_decision_action2.GetComponentInChildren<Text>();
+                txt.text = buttonaction2;
+            }
+            catch (NullReferenceException e)
+            {
+                btn_decision_action2 = GameObject.Find("btn_decision_action2");
+                Text txt = btn_decision_action2.GetComponentInChildren<Text>();
+                txt.text = buttonaction2;
+            }
+            
         }
 
         if (buttonaction3.Contains("N/A") || buttonaction3.Contains("N/A\n"))
         {
-            try
+            if (btn_decision_action3 != null)
             {
                 btn_decision_action3.SetActive(false);
-            }
-            catch
-            {
-                return;
             }
         }
         else
         {
-            btn_decision_action3 = DisableGameObjectChangeEnable("Mail_Content_Panel", "btn_decision_action3");
-            Text txt = btn_decision_action3.GetComponentInChildren<Text>();
-            txt.text = buttonaction3;
-            btn_decision_action3.SetActive(true);
-        }
-    }
-
-    public GameObject DisableGameObjectChangeEnable(string gameObjectParentStrName, string enableGameObjectName)
-    {
-        GameObject obj = new GameObject();
-        Transform can = GameObject.Find(gameObjectParentStrName).transform;
-        Debug.Log(can.name);
-        Transform[] tr = can.Find(enableGameObjectName).GetComponentsInChildren<Transform>();
-        foreach(Transform enableGameObject in tr)
-        {
-            Debug.Log(enableGameObject.gameObject.name + "=" + enableGameObjectName);
-            if (enableGameObject.gameObject.name == enableGameObjectName)
+            DisableGameObjectChangeEnable("Mail_Content_Panel", "btn_decision_action3");
+            try
             {
-                obj = enableGameObject.gameObject;
+                Text txt = btn_decision_action3.GetComponentInChildren<Text>();
+                txt.text = buttonaction3;
+            }
+            catch (NullReferenceException e)
+            {
+                btn_decision_action3 = GameObject.Find("btn_decision_action3");
+                Text txt = btn_decision_action3.GetComponentInChildren<Text>();
+                txt.text = buttonaction3;
             }
         }
-        return obj;
+        mailContentScriptID = gameObject.GetInstanceID();
+        MailInstanceIDHub instanceIDHub = GameObject.Find("Mail_Content_Panel").GetComponent<MailInstanceIDHub>();
+        instanceIDHub.mailInstanceID = prefabInstanceID;
+        instanceIDHub.mailContetnScriptID = mailContentScriptID;
+        Debug.Log("prfabInstaceID of SetMailProperty = " + prefabInstanceID);
+        Debug.Log("mailContentScriptID of SetMailProperty = " + mailContentScriptID);
+        instanceIDHub.mailInstanceIDPrint();
+        instanceIDHub.AddContentMailIDScript(mailContentScriptID, this);
+    }
+
+    public void DisableGameObjectChangeEnable(string gameObjectParentStrName, string enableGameObjectName)
+    {
+        Transform can = GameObject.Find(gameObjectParentStrName).transform;
+        Debug.Log(can.name);
+        Transform tr = can.Find(enableGameObjectName).transform;
+        tr.gameObject.SetActive(true);
+        //Transform[] tr = can.Find(enableGameObjectName).GetComponentsInChildren<Transform>();
+        /*foreach(Transform enableGameObject in tr)
+        {
+            if (enableGameObject.gameObject.name == enableGameObjectName)
+            {
+                Debug.Log(enableGameObject.gameObject.name + "=" + enableGameObjectName);
+                enableGameObject.gameObject.SetActive(true);
+            }
+        }*/
     }
 }
