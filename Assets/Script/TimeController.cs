@@ -58,13 +58,17 @@ public class TimeController : GameManager
         }
         else
         {
-            //newtime = newtime.AddMinutes((double)UnityEngine.Random.Range(1,10));
             TimeGeneration();
             Debug.Log("else statment called, new and new time vlaue : " + newtime);
-
         }
 
         return newtime;
+    }
+
+    public DateTime DateTimeParseFromString(string datetime)
+    {
+        DateTime var = DateTime.Parse(datetime);
+        return var;
     }
 
 

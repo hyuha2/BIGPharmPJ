@@ -156,6 +156,9 @@ public class EmailButtonPrefab : MonoBehaviour
         MailInstanceIDHub instanceIDHub = GameObject.Find("Mail_Content_Panel").GetComponent<MailInstanceIDHub>();
         instanceIDHub.mailInstanceID = prefabInstanceID;
         instanceIDHub.mailContetnScriptID = mailContentScriptID;
+        instanceIDHub.buttonaction_name_one = buttonaction1;
+        instanceIDHub.buttonaction_name_two = buttonaction2;
+        instanceIDHub.buttonaction_name_three = buttonaction3;
         Debug.Log("prfabInstaceID of SetMailProperty = " + prefabInstanceID);
         Debug.Log("mailContentScriptID of SetMailProperty = " + mailContentScriptID);
         instanceIDHub.mailInstanceIDPrint();
@@ -168,14 +171,5 @@ public class EmailButtonPrefab : MonoBehaviour
         Debug.Log(can.name);
         Transform tr = can.Find(enableGameObjectName).transform;
         tr.gameObject.SetActive(true);
-        //Transform[] tr = can.Find(enableGameObjectName).GetComponentsInChildren<Transform>();
-        /*foreach(Transform enableGameObject in tr)
-        {
-            if (enableGameObject.gameObject.name == enableGameObjectName)
-            {
-                Debug.Log(enableGameObject.gameObject.name + "=" + enableGameObjectName);
-                enableGameObject.gameObject.SetActive(true);
-            }
-        }*/
     }
 }

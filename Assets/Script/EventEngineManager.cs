@@ -29,7 +29,7 @@ public class EventEngineManager : MonoBehaviour
     public Queue<string> ButtonAction2 { get; set; } = new();
     public Queue<string> ButtonAction3 { get; set; } = new();
 
-    private Dictionary<int, GameObject> prefabInstanceID = new Dictionary<int, GameObject>();
+    private Dictionary<int, GameObject> prefabInstanceID = new Dictionary<int, GameObject>(); 
 
     public int lastePrefabInstanceID;
 
@@ -57,13 +57,14 @@ public class EventEngineManager : MonoBehaviour
         
         if(NewGameCheck())
         {
+            PlayData.playData.SetCompany_Money(1000000000);
             switch(engine.ToString())
             {
                 case "EventEngineManager (CEOEventEngine)":
                 ceoengine.InitialEventContents(eventdatalist);
                 break;
             } 
-        }    
+        }
     }
     public bool NewGameCheck()
     {
@@ -199,6 +200,8 @@ public class EventEngineManager : MonoBehaviour
         mailist_controller.txt_mail_receive_sender = sender;
         mailist_controller.prefabInstanceID = lastePrefabInstanceID;
         prefabInstanceID.Add(lastePrefabInstanceID, obj);
+        PlayData.playData.SetOrderDictionary(lastePrefabInstanceID, obj);
+        
         foreach (Text text in texts)
         {
             switch (text.name)
@@ -270,6 +273,7 @@ public class EventEngineManager : MonoBehaviour
         else
         {
             int waitlistcount = sendmailwaitlist.Count;
+            Debug.Log("snedmialwaitlist의 잔여 대기 메일수는 " + waitlistcount + " 입니다.");
             int releaseeventcount = 0;
             if (waitlistcount == 1)
             {
@@ -323,6 +327,7 @@ public class EventEngineManager : MonoBehaviour
                     Destroy(instance);
                     ebp.mcp.SetActive(false);
                     prefabInstanceID.Remove(hub.mailInstanceID);
+                    PlayData.playData.DelOrderDicionary(hub.mailInstanceID);
                     hub.mcsi.Remove(hub.mailContetnScriptID);
                     Destroy(ebp);
                 }
@@ -352,6 +357,7 @@ public class EventEngineManager : MonoBehaviour
         {
             Destroy(instance);
             prefabInstanceID.Remove(hub.mailInstanceID);
+            PlayData.playData.DelOrderDicionary(hub.mailInstanceID);
             
             if (hub.mcsi.TryGetValue(hub.mailContetnScriptID, out EmailButtonPrefab ebp))
             {
@@ -359,5 +365,15 @@ public class EventEngineManager : MonoBehaviour
                 hub.mcsi.Remove(hub.mailContetnScriptID);
             }
         }
+    }
+
+    public void OnClickActionButtonOne() // EventFromButton 에서 모든 이벤트를 핸들링 . 
+    {
+        if (hub == null)
+        {
+            hub = GameObject.Find("Mail_Content_Panel").GetComponent<MailInstanceIDHub>();
+        }
+        EventFromButtonOne one = new EventFromButtonOne();
+        one.Arrange(hub.buttonaction_name_one, hub.mailInstanceID);
     }
 }

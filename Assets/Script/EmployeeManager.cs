@@ -59,18 +59,18 @@ public class EmployeeManager : MonoBehaviour
         for(int i =0; i < assign_personal; i++)
         {
             int randomEmpNo = UnityEngine.Random.Range(1, employees.GetLength(0)+1);
-            if(employees[randomEmpNo+1, 11].Contains("FALSE"))
+            if(employees[randomEmpNo, 11].Contains("FALSE"))
             {
                 Debug.Log("직원번호 " + randomEmpNo + "가 고용되지 않았음을 확인하여 지금 부터 변경 합니다 ");
-                employees[randomEmpNo+1, 11] = "true";
-                employees[randomEmpNo+1, 7] = department;
-                employees[randomEmpNo+1, 9] = salary.ToString();
+                employees[randomEmpNo, 11] = "true";
+                employees[randomEmpNo, 7] = department;
+                employees[randomEmpNo, 9] = salary.ToString();
                 hired_person.Add(randomEmpNo);
                 Debug.Log("추가되었습니다. 현재 고용 인원은 " + hired_person.Count + "명 입니다 .");
             }
             else
             {
-                i = -1;
+                i -= 1;
                 Debug.Log(randomEmpNo + " 는 채용 된 직원 입니다 . 확인 바랍니다 . ");
             }
 
@@ -83,8 +83,8 @@ public class EmployeeManager : MonoBehaviour
         for(int i =0; i<hired_person.Count; i++)
         {
             int no = hired_person[i];
-            Debug.Log("직원번호 " + no+1 + "에 대해" + department +"소속인지 조회합니다 ");
-            if(employees[no+1, 7] == department)
+            Debug.Log("직원번호 " + no + "에 대해" + department +"소속인지 조회합니다 ");
+            if(employees[no, 7] == department)
             {
                 findEmpNo.Add(hired_person[i]);
                 Debug.Log("직원번호 " + hired_person[i] + "는 소속부서가 " + department + "입니다 .");
@@ -97,32 +97,54 @@ public class EmployeeManager : MonoBehaviour
     {
         Debug.Log("report host = " + reporthost);
         int findEmpNo = 0;
-        List<int> SearchEmpNo = new List<int>();
-        SearchEmpNo = FindEmployee_department(reporthost);
-        Debug.Log("SearchEMpNo = " + SearchEmpNo.Count);
-        int random_index = UnityEngine.Random.Range(0, SearchEmpNo.Count+1);
-        try
+        switch (reporthost)
         {
-            findEmpNo = SearchEmpNo[random_index];
-        }
-        catch (ArgumentOutOfRangeException e)
-        {
-            random_index = random_index - 1;
-            findEmpNo = SearchEmpNo[random_index];
-        }
-        Debug.Log("배열에 대한 Random index no = " + random_index);
-        
+            case "Bank":
+                findEmpNo = 1001;
+                break;
+
+            default:
+                List<int> SearchEmpNo = new List<int>();
+                SearchEmpNo = FindEmployee_department(reporthost);
+                Debug.Log("SearchEMpNo = " + SearchEmpNo.Count);
+                int random_index = UnityEngine.Random.Range(0, SearchEmpNo.Count + 1);
+                try
+                {
+                    findEmpNo = SearchEmpNo[random_index];
+                }
+                catch (ArgumentOutOfRangeException e)
+                {
+                    random_index = random_index - 1;
+                    try
+                    {
+                        findEmpNo = SearchEmpNo[random_index];
+                    }
+                    catch (ArgumentOutOfRangeException e_one)
+                    {
+                        findEmpNo = 0;
+                    }
+                }
+                Debug.Log("배열에 대한 Random index no = " + random_index);
+                break;
+        }        
         return findEmpNo;
     }
-
-
 
     public string[] Employee_information(int empNo)
     {
         string[] employee_info = new string[employees.GetLength(1)];
-        for(int i=0; i < employees.GetLength(1); i++)
+        switch (empNo)
         {
-            employee_info.SetValue(employees[empNo + 1, i], i);
+            case 1001:
+                employee_info = new string[]{"1001", "Bank", "Male", "KOR", "39", "default", "null", "null", "null", "0", "100", "TRUE", "null"};
+                break;
+
+            default:
+                for (int i = 0; i < employees.GetLength(1); i++)
+                {
+                    employee_info.SetValue(employees[empNo + 1, i], i);
+                }
+                break;
         }
         return employee_info;
     }

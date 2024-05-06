@@ -7,7 +7,11 @@ public class MailInstanceIDHub : MonoBehaviour
     public int mailInstanceID { get; set; }
     public int mailContetnScriptID { get; set; }
 
-    public Dictionary<int, EmailButtonPrefab> mcsi;
+    public string buttonaction_name_one { get; set; }
+    public string buttonaction_name_two { get; set; }
+    public string buttonaction_name_three { get; set; }
+
+    public Dictionary<int, EmailButtonPrefab> mcsi; // 저장 할 때 가져와 저장해야 할 것.
 
     private void Awake()
     {

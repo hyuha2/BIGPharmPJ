@@ -9,8 +9,8 @@ public class GameManager : MonoBehaviour
     private static string username;
     private static string time;
     private static bool newgame = false;
-    private static long companymoney;
     public static GameManager gm = null;
+    private float interest_rate { get; set; } = 3.5f;
     private void Awake()
     {
         if(gm == null)
@@ -21,10 +21,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        if(companymoney == 0)
-        {
-            companymoney = 1000000000;
-        }
+
     }
 
     // Update is called once per frame
@@ -53,5 +50,18 @@ public class GameManager : MonoBehaviour
     public bool GetNewGame(){
         return newgame;
     }
+
+    public string GetInterest_Rate()
+    {
+        string rate = interest_rate.ToString();
+        return rate;
+    }
+    
+    public float GetInterest_Rate_Float()
+    {
+        return interest_rate;
+    }
+
+
 
 }

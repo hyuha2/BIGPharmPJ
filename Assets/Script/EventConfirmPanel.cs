@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class EventConfirmPanel : MonoBehaviour
+public class EventConfirmPanel : MonoBehaviour //예, 아니오 팝업창에 대한 클래스. 
 {
     public Button btn_answer1 { get; set; }
     public Button btn_answer2 { get; set; }
@@ -28,10 +28,10 @@ public class EventConfirmPanel : MonoBehaviour
         txt_answer2.text = right;
     }
 
-    public void DeinteractableButtoninMCPPanel() 
+    public void DeinteractableButtoninMCPPanel()
     {
         Button[] buttoninmcp = GameObject.Find("Mail_Content_Panel").GetComponentsInChildren<Button>();
-        foreach(Button btn in buttoninmcp)
+        foreach (Button btn in buttoninmcp)
         {
             btn.interactable = false;
         }

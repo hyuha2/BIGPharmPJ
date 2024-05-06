@@ -126,7 +126,6 @@ public class EventEngine : EventEngineManager
                         contents[i, c] = eventdatalist[0, c];
                     }    
                 }
-                Debug.Log(contents[i + 1, j] + "=" + eventdatalist[eventno[i], j]);
                 contents[i+1, j] = eventdatalist[eventno[i], j];
             }
         }
@@ -160,8 +159,8 @@ public class EventEngine : EventEngineManager
 
     public void WokrFlowListandDicandQueueandPrefabEmail(string[,] filter) // 이니셜 이벤트 가져다 붙였더니 초기 이벤트가 도출되니 reowpoint 쪽에 아마 수정 필.
     {
-        eem.AddEventList(filter);
-        eem.AddQueue();
+        eem.AddEventList(filter); //tempeventlist에 등록.
+        eem.AddQueue(); //sendmailwaitlist 큐에 등록.
         int releaseevnetcount = eem.ReleaseEventCount(); // 그 중 몇 개의 초기 이벤트를 방출할건지 개수를 결정
         eem.DicBindingInList(releaseevnetcount); // 결정된 개수만큼 큐에서 꺼내 릴리즈 이벤트 리스트에 딕셔너리 타입으로 다시 담음
         eem.SliceDicinQueForEmailListDataSet(); // 메일 리스트에 필요한 데이터 각 요소를 큐로 각 요소별로 담음
