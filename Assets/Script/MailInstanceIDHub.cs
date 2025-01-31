@@ -6,6 +6,7 @@ public class MailInstanceIDHub : MonoBehaviour
 {
     public int mailInstanceID { get; set; }
     public int mailContetnScriptID { get; set; }
+    public int eventNo { get; set; }
 
     public string buttonaction_name_one { get; set; }
     public string buttonaction_name_two { get; set; }
@@ -15,6 +16,7 @@ public class MailInstanceIDHub : MonoBehaviour
 
     private void Awake()
     {
+        Debug.Log("Awake() is called in MailInstanceIDHub");
         if (mcsi == null)
         {
             mcsi = new Dictionary<int, EmailButtonPrefab>();

@@ -5,4 +5,5 @@ using UnityEngine;
 public interface IEventEngineChoice
 {
     void EngineChoice();
+    void SpecificMenu();
 }

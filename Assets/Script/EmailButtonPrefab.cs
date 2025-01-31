@@ -9,6 +9,7 @@ public class EmailButtonPrefab : MonoBehaviour
     public GameObject mcp;
     public int prefabInstanceID;
     public int mailContentScriptID;
+    public int no;
     public string txt_mail_title;
     public string txt_mail_receive_sender;
     public string txt_mail_receive_content;
@@ -16,6 +17,7 @@ public class EmailButtonPrefab : MonoBehaviour
     public string buttonaction1;
     public string buttonaction2;
     public string buttonaction3;
+    public string facepath;
 
     public GameObject btn_decision_action1;
     public GameObject btn_decision_action2;
@@ -24,6 +26,7 @@ public class EmailButtonPrefab : MonoBehaviour
 
     public void Awake()
     {
+        Debug.Log("Awake() is called in EmailButtonPrefab");
         mcp = GetMCP(); //초기값 비활성화 상태이기 때문에 가져옴.
     }
 
@@ -77,10 +80,11 @@ public class EmailButtonPrefab : MonoBehaviour
         Text title = GameObject.Find("txt_mail_receive_title").GetComponent<Text>();
         Text content = GameObject.Find("txt_mail_receive_content").GetComponent<Text>();
         Text sender = GameObject.Find("txt_mail_receive_sender").GetComponent<Text>();
+        Text time = GameObject.Find("txt_mail_receive_time").GetComponent<Text>();
         title.text = txt_mail_title;
         content.text = txt_mail_receive_content;
         sender.text = txt_mail_receive_sender;
-        Debug.Log("str btn 1,2,3 = " + buttonaction1 +" "+ buttonaction2 + " "+buttonaction3);
+        time.text = txt_mail_receive_time;
 
         if (buttonaction1.Contains("N/A"))
         {
@@ -104,6 +108,7 @@ public class EmailButtonPrefab : MonoBehaviour
                 txt.text = buttonaction1;
             }
             btn_decision_action1.SetActive(true);
+            btn_decision_action1.GetComponent<Button>().interactable = true;
         }
 
         if (buttonaction2.Contains("N/A"))
@@ -127,7 +132,8 @@ public class EmailButtonPrefab : MonoBehaviour
                 Text txt = btn_decision_action2.GetComponentInChildren<Text>();
                 txt.text = buttonaction2;
             }
-            
+            btn_decision_action2.GetComponent<Button>().interactable = true;
+
         }
 
         if (buttonaction3.Contains("N/A") || buttonaction3.Contains("N/A\n"))
@@ -151,11 +157,13 @@ public class EmailButtonPrefab : MonoBehaviour
                 Text txt = btn_decision_action3.GetComponentInChildren<Text>();
                 txt.text = buttonaction3;
             }
+            btn_decision_action3.GetComponent<Button>().interactable = true;
         }
         mailContentScriptID = gameObject.GetInstanceID();
         MailInstanceIDHub instanceIDHub = GameObject.Find("Mail_Content_Panel").GetComponent<MailInstanceIDHub>();
         instanceIDHub.mailInstanceID = prefabInstanceID;
         instanceIDHub.mailContetnScriptID = mailContentScriptID;
+        instanceIDHub.eventNo = no;
         instanceIDHub.buttonaction_name_one = buttonaction1;
         instanceIDHub.buttonaction_name_two = buttonaction2;
         instanceIDHub.buttonaction_name_three = buttonaction3;

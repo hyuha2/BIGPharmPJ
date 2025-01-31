@@ -3,24 +3,42 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Diagnostics;
+using Debug = UnityEngine.Debug;
 
 public class EventEngineManager : MonoBehaviour
 {
     public static EventEngineManager em;
     private static string[,] eventdatalist;
+    public string[,] pharmaceutical_list;
     public string Gamemode {get; set;}
     public static EventEngine engine; // SelectDB()에서 모드 엔진 참고 인스턴트.
     public static IEventEngineChoice iec;
+    public static CSVController csvc;
+    public static MFGScheduler mfg_scheduler;
+    public static QualityScheduler quality_scheduler;
+    public MarketReserachReport mrr;
     public CEOEventEngine ceoengine;
     public TimeController timectr;
     public MailInstanceIDHub hub;
+    public EventFromButtonOne one;
+    public EventFromButtonTwo two;
+
+    public static int MFG_Order;
+    public static int qc_order_seq_no;
+
+    public long globalPopulation = 8161972572; // 세계 인구
 
     public GameObject maillist;
 
     public List<Dictionary<string, object>> tmpeventlist = new(); // 임시적으로 해당 키워드 이벤트 내용들 저장.
     public List<Dictionary<string, object>> releaseevent; // 그 중 메일 몇 개 보낼지 랜덤 결정해서 개수만큼 저장.
+    public static List<int> companyNo = new();
+    public static List<int> controlledEventNo = new();
+    public static List<Deviation> deviations_list = new();
 
     public static Queue<Dictionary<string, object>> sendmailwaitlist = new(); // release event 결정되기전 큐에 대기.
+    public Queue<string> EventType1 { get; set; } = new();
     public Queue<string> ReportHost { get; set; } = new();
     public Queue<string> MailSubject { get; set; } = new();
     public Queue<string> EventContents { get; set; } = new();
@@ -29,23 +47,35 @@ public class EventEngineManager : MonoBehaviour
     public Queue<string> ButtonAction2 { get; set; } = new();
     public Queue<string> ButtonAction3 { get; set; } = new();
 
-    private Dictionary<int, GameObject> prefabInstanceID = new Dictionary<int, GameObject>(); 
+    private Dictionary<int, GameObject> prefabInstanceID = new Dictionary<int, GameObject>(); // 메일 관리 차원에서 만들었던 것 같은... 
+    public static Dictionary<string, Company> companyInformation = new();
 
     public int lastePrefabInstanceID;
-
+    public string selected_mode_engine_name;
 
     private void Awake()
     {
-        if(em==null)
+        Debug.Log("Awake() called in EventEngineManager");
+        if (em==null)
         {
             em = this;
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
         }
         else
         {
-            Destroy(gameObject);
+            StackTrace stackTrace = new();
+            for(int i=1; i<stackTrace.FrameCount; i++)
+            {
+                StackFrame stf = stackTrace.GetFrame(i);
+                if (stf.GetMethod() != null && stf.GetMethod().DeclaringType != null)
+                {
+                    Debug.Log($"{stf.GetMethod().DeclaringType.FullName}.{stf.GetMethod().Name}");
+                }
+            }
+            //Destroy(gameObject);
         }
-        timectr = GameObject.Find("TimeController").GetComponent<TimeController>();
+
+        csvc = GameObject.Find("CSVController").GetComponent<CSVController>();
     }
 
     void Start()
@@ -54,28 +84,47 @@ public class EventEngineManager : MonoBehaviour
         Debug.Log("DBNAME SELECT SUCCESS");
         ReceiveDB(dbname);
         Debug.Log("DB RECEVIED SUCCESS");
-        
-        if(NewGameCheck())
+        timectr = GameObject.Find("TimeController").GetComponent<TimeController>();
+        pharmaceutical_list = EventEngineManager.csvc.CSVRead("Bio_pharmaceutical_data.csv");
+        mfg_scheduler = GameObject.Find("MFGScheduler").GetComponent<MFGScheduler>();
+        one = new();
+        two = new();
+
+        if (NewGameCheck())
         {
             PlayData.playData.SetCompany_Money(1000000000);
-            switch(engine.ToString())
+            Product product = new Product()
+            {
+                pharmaceutical_data_no = 3000,
+                BrandName = "자가맙",
+                IngredientName = "Infliximab"
+            };
+            PlayData.ProductInformation.Add(product);
+            switch(selected_mode_engine_name) //origin : engine.ToString()
             {
                 case "EventEngineManager (CEOEventEngine)":
-                ceoengine.InitialEventContents(eventdatalist);
+                    ceoengine.InitialEventContents(eventdatalist);
                 break;
-            } 
+            }
+            MFG_Order = 1; //생산 오더에 대한 키 값으로 사용 예정
+            qc_order_seq_no = 1;
         }
+       
     }
     public bool NewGameCheck()
     {
-        bool newgame = GameObject.Find("GameManager").GetComponent<GameManager>().GetNewGame();
+        bool newgame = GameManager.gm.GetNewGame();
         return newgame;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SetEventDataList(string[,] EventDataList)
     {
-        
+        eventdatalist = EventDataList;
+    }
+
+    public string[,] GetEventDataList()
+    {
+        return eventdatalist;
     }
 
     private string SelectDB()
@@ -86,11 +135,12 @@ public class EventEngineManager : MonoBehaviour
         switch(btnname)
         {
             case "btn_ceomode":
-            btnname = "EventDB_CEO.csv";
-            Gamemode = "CEO";
-            ceoengine = GameObject.Find("EventEngineManager").AddComponent<CEOEventEngine>().GetComponent<CEOEventEngine>();
-            engine = ceoengine;
-            iec = new CEOEventEngine();
+                btnname = "EventDB_CEO.csv";
+                Gamemode = "CEO";
+                ceoengine = GameObject.Find("EventEngineManager").AddComponent<CEOEventEngine>().GetComponent<CEOEventEngine>();
+                selected_mode_engine_name = ceoengine.ToString();
+                engine = new EventEngine();
+                iec = new CEOEventEngine();
             break;
         }
         
@@ -177,11 +227,12 @@ public class EventEngineManager : MonoBehaviour
         string buttonaction1 = ButtonAction1.Dequeue();
         string buttonaction2 = ButtonAction2.Dequeue();
         string buttonaction3 = ButtonAction3.Dequeue();
+        string time = TimeController.tc.TimeGeneration();
 
-        StartCoroutine(SendMail(no, sender, emailtitle, eventcontents, buttonaction1, buttonaction2, buttonaction3, faceURL));
+        StartCoroutine(SendMail(no, sender, emailtitle, eventcontents, buttonaction1, buttonaction2, buttonaction3, faceURL, time));
     }
 
-    IEnumerator SendMail(int no, string sender, string emailtitle, string eventcontents, string buttonaction1, string buttonaction2, string buttonaction3, string faceURL) // 이 부분에서 이벤트 트랙커를 만들고 버튼도 구분 할 수 있게 해야하겠음 .
+    public IEnumerator SendMail(int no, string sender, string emailtitle, string eventcontents, string buttonaction1, string buttonaction2, string buttonaction3, string faceURL, string time) // 이 부분에서 이벤트 트랙커를 만들고 버튼도 구분 할 수 있게 해야하겠음 .
     {
         GameObject obj = Instantiate(maillist);
         lastePrefabInstanceID = obj.GetInstanceID();
@@ -189,10 +240,6 @@ public class EventEngineManager : MonoBehaviour
         Transform rct = GameObject.Find("Content").transform;
         Text[] texts = obj.GetComponentsInChildren<Text>();
         //Image profile = obj.GetComponent<Image>();
-        if (timectr == null)
-        {
-            timectr = new();
-        }
         EmailButtonPrefab mailist_controller = obj.transform.Find("MailListController").GetComponent<EmailButtonPrefab>();
         mailist_controller.buttonaction1 = buttonaction1;
         mailist_controller.buttonaction2 = buttonaction2;
@@ -200,8 +247,6 @@ public class EventEngineManager : MonoBehaviour
         mailist_controller.txt_mail_receive_sender = sender;
         mailist_controller.prefabInstanceID = lastePrefabInstanceID;
         prefabInstanceID.Add(lastePrefabInstanceID, obj);
-        PlayData.playData.SetOrderDictionary(lastePrefabInstanceID, obj);
-        
         foreach (Text text in texts)
         {
             switch (text.name)
@@ -227,14 +272,36 @@ public class EventEngineManager : MonoBehaviour
                     break;
 
                 case "email_receive_time":
-                    text.text = timectr.TimeGeneration();
+                    text.text = time;
                     mailist_controller.txt_mail_receive_time = text.text;
                     break;
             }
         }
+        AddForControlledEventNo(no, lastePrefabInstanceID); // 이벤트 관리를 위해 'EventType1' 로 지정된 이벤트에 대해 발생 이벤트 번호 추가 
         obj.transform.SetParent(rct);
-        float randomtime = UnityEngine.Random.value;
-        yield return new WaitForSeconds(randomtime);
+        yield return new WaitForSeconds(1f);
+    }
+    public void AddForControlledEventNo(int evetNo, int prefabInstanceID)
+    {
+        try
+        {
+            if(eventdatalist[evetNo, 1] == "Play")
+            {
+                controlledEventNo.Add(prefabInstanceID);
+
+                if(eventdatalist[evetNo, 2] == "Deviation")
+                {
+                    if(eventdatalist[evetNo, 3] == "Manufacture")
+                    {
+                        string devScenario = new Deviation().Generation_Deviation_Scenario(prefabInstanceID, "Manufacture");
+                    }
+                }
+            }
+        }
+        catch(Exception e)
+        {
+
+        }
     }
 
     public void DelTmpEventList()
@@ -254,6 +321,7 @@ public class EventEngineManager : MonoBehaviour
     public int ReleaseEventCount()
     {
         int quecount= sendmailwaitlist.Count;
+        //int releaseevnetcount = engine.RandomNumber(quecount);
         int releaseevnetcount = engine.RandomNumber(quecount);
         Debug.Log("ReleaseEventCount = " + releaseevnetcount);
         return releaseevnetcount;
@@ -327,7 +395,7 @@ public class EventEngineManager : MonoBehaviour
                     Destroy(instance);
                     ebp.mcp.SetActive(false);
                     prefabInstanceID.Remove(hub.mailInstanceID);
-                    PlayData.playData.DelOrderDicionary(hub.mailInstanceID);
+                    //PlayData.playData.DelMailBox(hub.mailInstanceID);
                     hub.mcsi.Remove(hub.mailContetnScriptID);
                     Destroy(ebp);
                 }
@@ -357,7 +425,7 @@ public class EventEngineManager : MonoBehaviour
         {
             Destroy(instance);
             prefabInstanceID.Remove(hub.mailInstanceID);
-            PlayData.playData.DelOrderDicionary(hub.mailInstanceID);
+            //PlayData.playData.DelMailBox(hub.mailInstanceID);
             
             if (hub.mcsi.TryGetValue(hub.mailContetnScriptID, out EmailButtonPrefab ebp))
             {
@@ -373,7 +441,20 @@ public class EventEngineManager : MonoBehaviour
         {
             hub = GameObject.Find("Mail_Content_Panel").GetComponent<MailInstanceIDHub>();
         }
-        EventFromButtonOne one = new EventFromButtonOne();
         one.Arrange(hub.buttonaction_name_one, hub.mailInstanceID);
+    }
+
+    public void OnClickActionButtonTwo() // EventFromButton 에서 모든 이벤트를 핸들링 . 
+    {
+        if (hub == null)
+        {
+            hub = GameObject.Find("Mail_Content_Panel").GetComponent<MailInstanceIDHub>();
+        }
+        two.Arrange(hub.buttonaction_name_two, hub.mailInstanceID);
+    }
+
+    public string GetPharmaceutical_Name(int no)
+    {
+        return pharmaceutical_list[no-3000, 1];
     }
 }

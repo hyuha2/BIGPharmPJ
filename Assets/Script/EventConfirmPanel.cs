@@ -46,6 +46,15 @@ public class EventConfirmPanel : MonoBehaviour //예, 아니오 팝업창에 대
         }
     }
 
+    public void InteractableButtonCEOSpecificPanel()
+    {
+        Button[] buttoninmcp = GameObject.Find("CEOSpecificPanel").GetComponentsInChildren<Button>();
+        foreach (Button btn in buttoninmcp)
+        {
+            btn.interactable = true;
+        }
+    }
+
     public void OnClickRight()
     {
         gameObject.SetActive(false);

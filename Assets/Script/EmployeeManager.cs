@@ -9,33 +9,33 @@ public enum AdminstratorTeam {HR,IR,Finance,Purchase}
 public class EmployeeManager : MonoBehaviour
 {
 
-    public EmployeeManager epm;
+    public static EmployeeManager epm;
     public string [,] employees;
     public List<int> hired_person = new List<int>();
 
     
     void Awake()
     {
-        if(epm == null)
+        Debug.Log("Awake() is called in EmployeeManager");
+        if (epm == null)
         {
             epm = this;
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
         }
         else
         {
-            Destroy(gameObject);
+            //Destroy(gameObject);
         }
 
         if (employees == null)
         {
             CSVController csv = GameObject.Find("CSVController").GetComponent<CSVController>();
             employees = csv.CSVRead("Employee_list.csv");
-
         }
 
         if (GameManager.gm.GetNewGame())
         {
-            Debug.Log("직원추가 대");
+
             ArrangeDepartment(1, Department.OwnerSecretary.ToString(), UnityEngine.Random.Range(22000000, 50000000));
             ArrangeDepartment(5, Department.RD.ToString(), UnityEngine.Random.Range(22000000, 50000000));
             ArrangeDepartment(8, Department.Manufacture.ToString(), UnityEngine.Random.Range(22000000, 50000000));
@@ -58,15 +58,15 @@ public class EmployeeManager : MonoBehaviour
     {
         for(int i =0; i < assign_personal; i++)
         {
-            int randomEmpNo = UnityEngine.Random.Range(1, employees.GetLength(0)+1);
+            int randomEmpNo = UnityEngine.Random.Range(1, employees.GetLength(0));
             if(employees[randomEmpNo, 11].Contains("FALSE"))
             {
-                Debug.Log("직원번호 " + randomEmpNo + "가 고용되지 않았음을 확인하여 지금 부터 변경 합니다 ");
+                //Debug.Log("직원번호 " + randomEmpNo + "가 고용되지 않았음을 확인하여 지금 부터 변경 합니다 ");
                 employees[randomEmpNo, 11] = "true";
                 employees[randomEmpNo, 7] = department;
                 employees[randomEmpNo, 9] = salary.ToString();
                 hired_person.Add(randomEmpNo);
-                Debug.Log("추가되었습니다. 현재 고용 인원은 " + hired_person.Count + "명 입니다 .");
+                //Debug.Log("추가되었습니다. 현재 고용 인원은 " + hired_person.Count + "명 입니다 .");
             }
             else
             {
@@ -83,11 +83,11 @@ public class EmployeeManager : MonoBehaviour
         for(int i =0; i<hired_person.Count; i++)
         {
             int no = hired_person[i];
-            Debug.Log("직원번호 " + no + "에 대해" + department +"소속인지 조회합니다 ");
+            //Debug.Log("직원번호 " + no + "에 대해" + department +"소속인지 조회합니다 ");
             if(employees[no, 7] == department)
             {
                 findEmpNo.Add(hired_person[i]);
-                Debug.Log("직원번호 " + hired_person[i] + "는 소속부서가 " + department + "입니다 .");
+                //Debug.Log("직원번호 " + hired_person[i] + "는 소속부서가 " + department + "입니다 .");
             }
         }
         return findEmpNo;
@@ -106,11 +106,12 @@ public class EmployeeManager : MonoBehaviour
             default:
                 List<int> SearchEmpNo = new List<int>();
                 SearchEmpNo = FindEmployee_department(reporthost);
-                Debug.Log("SearchEMpNo = " + SearchEmpNo.Count);
-                int random_index = UnityEngine.Random.Range(0, SearchEmpNo.Count + 1);
+                Debug.Log("SearchEMpNo = " + SearchEmpNo[0] + "SearchEmpNo Cout = " + SearchEmpNo.Count);
+                int random_index = UnityEngine.Random.Range(0, SearchEmpNo.Count);
                 try
                 {
                     findEmpNo = SearchEmpNo[random_index];
+                    Debug.Log("try statment : findEmpNo = " + findEmpNo);
                 }
                 catch (ArgumentOutOfRangeException e)
                 {
@@ -118,10 +119,12 @@ public class EmployeeManager : MonoBehaviour
                     try
                     {
                         findEmpNo = SearchEmpNo[random_index];
+                        Debug.Log("catch and try statment : findEmpNo = " + findEmpNo);
                     }
                     catch (ArgumentOutOfRangeException e_one)
                     {
                         findEmpNo = 0;
+                        Debug.Log("catch and catch statment : findEmpNo = " + findEmpNo);
                     }
                 }
                 Debug.Log("배열에 대한 Random index no = " + random_index);
@@ -142,14 +145,33 @@ public class EmployeeManager : MonoBehaviour
             default:
                 for (int i = 0; i < employees.GetLength(1); i++)
                 {
-                    employee_info.SetValue(employees[empNo + 1, i], i);
+                    employee_info.SetValue(employees[empNo, i], i);
                 }
                 break;
         }
         return employee_info;
     }
 
+    public string Get_Specificity_Employee_Information(int empNo, int db_index)
+    {
+        string[] employee_info = Employee_information(empNo);
+        string specifity_index = employee_info[db_index];
 
+        return specifity_index;
+    }
 
+    public int SumRDEmployeeAbility()
+    {
+        int sumRDEmployeeAbility = 0;
+        List<int> RDEmployee = FindEmployee_department(Department.RD.ToString());
+        string[] RDEmployeeInformation = new string[RDEmployee.Count];
 
+        foreach (int a in RDEmployee)
+        {
+            RDEmployeeInformation = Employee_information(a);
+            sumRDEmployeeAbility += int.Parse(RDEmployeeInformation[10]);
+        }
+
+        return sumRDEmployeeAbility;
+    }
 }
